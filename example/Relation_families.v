@@ -29,7 +29,7 @@ Trakt Add Embedding
       (N_Z_ConditionProof_bool).
 
 
-(* Boolean predicates for other theories *)
+(* Equality for bit vectors *)
 
 Parameter bitvector : N -> Type.
 Parameter bv_eq :
@@ -45,12 +45,17 @@ Trakt Add Relation 2
   (fun n a b => bv_eq_P2B n a b).
 
 
-(* Tests *)
+(* This one goes through... *)
+
 Goal forall (a b : bitvector 42),
     a = b.
 Proof.
   intros. trakt Z bool.
 Abort.
+
+
+(* ... but this one fails. It does not fail if there is not embedding on
+   N. *)
 
 Parameter land : forall n, bitvector n -> bitvector n -> bitvector n.
 

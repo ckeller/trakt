@@ -21,6 +21,11 @@ Section list.
 
 End list.
 
+
+(* This fails, but it make sense that it fails since eqlist depends on
+   eqA. I guess this is a problem that will be solved in the version
+   based on parametricity? *)
+
 Trakt Add Relation 2
   (fun (A:Type) (eqA : A -> A -> bool) (eq_eqA : forall (a b:A), a = b <-> eqA a b = true) => @eq (list A))
   (fun (A:Type) (eqA : A -> A -> bool) (eq_eqA : forall (a b:A), a = b <-> eqA a b = true) => eqlist A eqA)
