@@ -137,7 +137,7 @@ pred compose-all i:(list term), o:term.
 
 compose-all Functions (fun `H` OriginT F) :-
   Functions = [F1|_],
-  coq.typecheck F1 {{ lp:OriginT -> _ }} ok,
+  @ltacfail! 0 => std.assert-ok! (coq.typecheck F1 {{ lp:OriginT -> _ }}) "trakt produced an ill-typed term",
   % coq.typecheck F1 TF1 ok,
   % coq.unify-eq TF1 {{ lp:OriginT -> _ }} ok,
   pi x\ decl x _ OriginT => apply-all Functions x (F x).
