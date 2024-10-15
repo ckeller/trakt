@@ -15,9 +15,11 @@ pred preprocess-extra
 preprocess-extra
   Term Context ETargetOpt LTarget TVar MustGeneralise Term' TypedFinalProof :- std.do! [
     % 1. make a full term
+    coq.say "preprocess-extra 01",
     coq.elaborate-skeleton Term _ Term1 ok,
 
     % 2. generalise
+    coq.say "preprocess-extra 02",
     if (MustGeneralise) (
       generalise-free-variables Term1 ETargetOpt Context Term2 GenProofF
     ) (
@@ -26,6 +28,7 @@ preprocess-extra
     ),
 
     % 3. put all logic in Prop if the target is Prop
+    coq.say "preprocess-extra 03",
     if (LTarget = {{ Prop }}) (
       bool-to-prop Term2 TVar Term3 B2PProof,
       build B2PProof B2PCoqProof,
@@ -46,33 +49,54 @@ preprocess-extra
       (coq.say "after bool to Prop:" {coq.term->string Term3}),
 
     % 4. launch preprocessing
+    coq.say "preprocess-extra 04",
     preprocess Term3 ETargetOpt LTarget TVar (t\ t) Term4 Proof,
 
     when (debug)
       (coq.say "after preprocess (raw):" Term4),
 
     % 5. build Coq terms
+    coq.say "preprocess-extra 05a",
     clear-custom-terms Term4 Term',
+    coq.say "preprocess-extra 05b",
     when (verbose)
       (coq.say "after preprocess:" {coq.term->string Term'}),
     clear-custom-terms-in-proof Proof Proof',
+    coq.say "preprocess-extra 05c",
     when (debug)
       (coq.say "preprocess proof (raw):" Proof'),
+    % coq.say "Proof' = " Proof',
+    %% Look at preprocess.elpi
     build Proof' CoqProof,
+    coq.say "preprocess-extra 05d",
     when (debug)
       (coq.say "preprocess proof:" {coq.term->string CoqProof}),
     if (Term' = Term1) (
+        coq.say "preprocess-extra 05d1",
       TypedFinalProof = {{ @id lp:Term1 }}
-    ) (std.do! [
+    ) (    coq.say "preprocess-extra 05d2",
+    std.do! [
+        coq.say "preprocess-extra branch 01",
+        coq.term->string CoqProof CoqProofS,
+        coq.say "CoqProof = " CoqProofS,
       clear-custom-terms CoqProof CleanCoqProof,
+        coq.say "preprocess-extra branch 02",
+        coq.term->string CleanCoqProof CleanCoqProofS,
+        coq.say "CleanCoqProof = " CleanCoqProofS,
+      coq.elaborate-skeleton CleanCoqProof _ _ (error Err),
+      coq.say "Error: " Err,
       coq.elaborate-skeleton CleanCoqProof _ CleanTypedCoqProof ok,
       if (TVar = covariant) (
+        coq.say "preprocess-extra branch 03a",
         FinalProof = fun _ Term' (p\ GenProofF (B2PProofF (app [CleanTypedCoqProof, p])))
       ) (
+        coq.say "preprocess-extra branch 03b",
         FinalProof = fun _ Term1 (p\ app [CleanTypedCoqProof, B2PProofF (GenProofF p)])
       ),
+        coq.say "preprocess-extra branch 04",
       coq.elaborate-skeleton FinalProof _ TypedFinalProof ok
-    ])
+    ]),
+    coq.say "preprocess-extra 05e"
   ].
 
 pred nat2int i:term, o:int.

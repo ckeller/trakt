@@ -42,6 +42,7 @@ Elpi Accumulate File bool_to_prop.
 Elpi Accumulate File tactic.
 Elpi Accumulate lp:{{
   solve InitialGoal NewGoals :-
+    coq.say "Cas 01",
     InitialGoal = goal Context _ InitialGoalTy _ [trm ETarget, trm LTarget, trm RuntimeRelData],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}), !,
     std.assert! (format-runtime-relation-data RuntimeRelData RuntimeRelCtx)
@@ -51,6 +52,7 @@ Elpi Accumulate lp:{{
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals.
 
   solve InitialGoal NewGoals :-
+    coq.say "Cas 02",
     InitialGoal = goal Context _ InitialGoalTy _ [trm ETarget, trm LTarget],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}), !,
     [] =>
@@ -58,6 +60,7 @@ Elpi Accumulate lp:{{
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals.
 
   solve InitialGoal NewGoals :-
+    coq.say "Cas 03",
     InitialGoal = goal Context _ InitialGoalTy _ [trm LTarget, trm RuntimeRelData],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}), !,
     std.assert! (format-runtime-relation-data RuntimeRelData RuntimeRelCtx)
@@ -67,6 +70,7 @@ Elpi Accumulate lp:{{
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals.
 
   solve InitialGoal NewGoals :-
+    coq.say "Cas 04",
     InitialGoal = goal Context _ InitialGoalTy _ [trm LTarget],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}), !,
     [] =>
@@ -74,6 +78,7 @@ Elpi Accumulate lp:{{
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals.
 
   solve _ _ :-
+    coq.say "Cas 05",
     coq.error "usage: trakt [target embedding type] <bool|Prop> [with rel <relations>]".
 }}.
 Elpi Typecheck.
@@ -107,6 +112,7 @@ Elpi Accumulate File bool_to_prop.
 Elpi Accumulate File tactic.
 Elpi Accumulate lp:{{
   solve Goal NewGoals :-
+    coq.say "Cas 06",
     Goal = goal _ _ GoalTy _ [trm ETarget, trm LTarget, trm H, str S, trm RuntimeRelData],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}),
     (H = global _ ; def H _ _ _ ; decl H _ _), !,
@@ -119,6 +125,7 @@ Elpi Accumulate lp:{{
       refine (let Name T' (app [P, H]) (t\ {{ _ : lp:GoalTy }})) Goal NewGoals.
 
   solve Goal NewGoals :-
+    coq.say "Cas 07",
     Goal = goal _ _ GoalTy _ [trm ETarget, trm LTarget, trm H, str S],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}),
     (H = global _ ; def H _ _ _ ; decl H _ _), !,
@@ -129,6 +136,7 @@ Elpi Accumulate lp:{{
       refine (let Name T' (app [P, H]) (t\ {{ _ : lp:GoalTy }})) Goal NewGoals.
   
   solve Goal NewGoals :-
+    coq.say "Cas 08",
     Goal = goal _ _ GoalTy _ [trm LTarget, trm H, str S, trm RuntimeRelData],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}),
     (H = global _ ; def H _ _ _ ; decl H _ _), !,
@@ -141,6 +149,7 @@ Elpi Accumulate lp:{{
       refine (let Name T' (app [P, H]) (t\ {{ _ : lp:GoalTy }})) Goal NewGoals.
     
   solve Goal NewGoals :-
+    coq.say "Cas 09",
     Goal = goal _ _ GoalTy _ [trm LTarget, trm H, str S],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}),
     (H = global _ ; def H _ _ _ ; decl H _ _), !,
@@ -151,6 +160,7 @@ Elpi Accumulate lp:{{
       refine (let Name T' (app [P, H]) (t\ {{ _ : lp:GoalTy }})) Goal NewGoals.
   
   solve _ _ :-
+    coq.say "Cas 10",
     coq.error {std.string.concat "\n" [
       "usage:",
       "  trakt_pose [target embedding type] <bool|Prop> :",
@@ -182,6 +192,7 @@ Elpi Accumulate File common.
 Elpi Accumulate File proof.
 Elpi Accumulate File boolify_arrows.
 Elpi Accumulate lp:{{
+    coq.say "Cas 11",
   solve ((goal _ _ GoalTy _ []) as InitialGoal) NewGoals :- !, std.do! [
     coq.elaborate-skeleton GoalTy _ EGoalTy ok,
     boolify-arrows EGoalTy covariant true GoalTy' Proof,
@@ -190,6 +201,7 @@ Elpi Accumulate lp:{{
   ].
 
   solve _ _ :-
+    coq.say "Cas 12",
     coq.error "usage: trakt_boolify_arrows.".
 }}.
 Elpi Typecheck.
@@ -202,7 +214,7 @@ Elpi Accumulate File types.
 Elpi Accumulate File common.
 Elpi Accumulate File reorder_quantifiers.
 Elpi Accumulate lp:{{
-  solve ((goal _ _ GoalTy _ []) as InitialGoal) NewGoals :- !, std.do! [
+  solve ((goal _ _ GoalTy _ []) as InitialGoal) NewGoals :- coq.say "Cas 13", !, std.do! [
     coq.elaborate-skeleton GoalTy _ EGoalTy ok,
     reorder-goal EGoalTy Proof,
     coq.elaborate-skeleton Proof _ EProof ok,
@@ -210,6 +222,7 @@ Elpi Accumulate lp:{{
   ].
 
   solve _ _ :-
+    coq.say "Cas 14",
     coq.error "usage: trakt_reorder_quantifiers.".
 }}.
 Elpi Typecheck.
