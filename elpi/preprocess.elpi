@@ -17,6 +17,7 @@ pred preprocess
   i:term,           % target logic expression type (bool or Prop)
   i:type-variance,  % direction of the implication proof (NewGoal -> OldGoal or OldGoal -> NewGoal)
   i:(term -> term), % context of the current term (important for rewrite proofs)
+  i:bool,           % tell if we preprocess relations
   o:term,           % preprocessed Coq term
   o:proof.          % proof of preprocessing (implication proof)
 
@@ -25,9 +26,13 @@ pred preprocess
 %   contravariant positions of logical connectors
 % - the context parameter allows generating rewrite proofs for subterms thanks to eq_rect
 %   (eq_rect asks for a context for the term to be rewritten)
+% - the parameter telling if we preprocess relations is set to false under context:
+%   `P <-> Q` does not imply `forall (C : Prop -> Prop), C P -> C Q` in full generality
+%   (it is equivalent to propositional extensionality)
 
 % special case for logical implication because it does not change
 preprocess {{ lp:A -> lp:B }} ETargetOpt LTarget TVar _ {{ lp:A' -> lp:B' }} Proof :-
+  coq.say "preprocess case 01",
   coq.typecheck A {{ Prop }} ok,
   coq.typecheck B {{ Prop }} ok, !,
   when (debug) (coq.say "preprocess ->"),
@@ -41,6 +46,7 @@ preprocess {{ lp:A -> lp:B }} ETargetOpt LTarget TVar _ {{ lp:A' -> lp:B' }} Pro
   ).
 
 preprocess (prod N T F) ETargetOpt LTarget TVar _ OutTerm Proof :- !,
+  coq.say "preprocess case 02",
   when (debug) (coq.say "preprocess forall" {coq.term->string T}),
   pi x\ decl x _ T => (
     % first we preprocess the quantified term
@@ -155,6 +161,7 @@ preprocess (prod N T F) ETargetOpt LTarget TVar _ OutTerm Proof :- !,
   ).
 
 preprocess {{ True }} _ LTarget TVar _ OutTerm Proof :- !,
+  coq.say "preprocess case 03",
   when (debug) (coq.say "preprocess True"),
   if (LTarget = {{ Prop }}) (
     OutTerm = {{ True }},
@@ -169,6 +176,7 @@ preprocess {{ True }} _ LTarget TVar _ OutTerm Proof :- !,
   ).
 
 preprocess {{ False }} _ LTarget TVar _ OutTerm Proof :- !,
+  coq.say "preprocess case 04",
   when (debug) (coq.say "preprocess False"),
   if (LTarget = {{ Prop }}) (
     OutTerm = {{ False }},
@@ -188,12 +196,14 @@ preprocess {{ False }} _ LTarget TVar _ OutTerm Proof :- !,
 preprocess
   (app [cast RE, app [cast E, Term]]) (some ETarget) LTarget TVar CtxF
   (app [cast RE, Term']) Proof :-
+    coq.say "preprocess case 05",
     embedding _ ETarget E RE _ _ _ _ _, !,
     when (debug) (coq.say "preprocess embedding identity above" {coq.term->string Term}),
     preprocess (app [cast E, Term]) (some ETarget) LTarget TVar (t\ CtxF (app [RE, t])) Term' Proof.
 
 % iff has a special case because argument positions have double variance
-preprocess {{ lp:A <-> lp:B }} ETargetOpt LTarget TVar _ OutTerm Proof :- !, std.do! [
+preprocess {{ lp:A <-> lp:B }} ETargetOpt LTarget TVar _ OutTerm Proof :- coq.say "preprocess case 06",
+ !, std.do! [
   when (debug) (coq.say "preprocess iff"),
   if (TVar = covariant) (Refl = {{ Booleqb_iff_impl }}) (Refl = {{ iff_Booleqb_impl }}),
   invert-variance TVar OppositeTVar,
@@ -216,6 +226,7 @@ preprocess {{ lp:A <-> lp:B }} ETargetOpt LTarget TVar _ OutTerm Proof :- !, std
 % logical connector
 preprocess (app [F|Args]) ETargetOpt LTarget TVar _ OutTerm Proof :-
   logical-connector F F' ArgTVars ImplMorph ReflB2P ReflP2B, !,
+  coq.say "preprocess case 07",
   when (debug) (coq.say "preprocess logical" {coq.term->string F}),
   if (TVar = covariant) (
     ArgTVars' = ArgTVars,
@@ -245,6 +256,7 @@ preprocess (app [F|Args]) ETargetOpt LTarget TVar _ OutTerm Proof :-
 
 % embedded (or not) function application (symbol)
 preprocess Term (some ETarget) LTarget TVar CtxF Term' Proof :-
+  coq.say "preprocess case 08",
   ((
     Term = app [cast E, app [F|Args]],
     embedding _ ETarget E _ _ _ _ _ _, !
@@ -296,6 +308,7 @@ preprocess (app [F|Args]) none LTarget TVar CtxF Term' Proof :-
     symbol G none F' EqProof,
     coq.unify-eq (app [F, X]) G ok
   )), !,
+  coq.say "preprocess case 09",
   when (debug) (coq.say "preprocess symbol (no target)" {coq.term->string F}),
   EqRwProof = proof.lift-eq TVar CtxF (app [EqProof|Args']),
   preprocess.args Args' none LTarget TVar (ts\ CtxF (app [F'|ts])) ProcessedArgs ArgProofs,
@@ -304,6 +317,7 @@ preprocess (app [F|Args]) none LTarget TVar CtxF Term' Proof :-
 
 % relation
 preprocess (app [F|Args]) (some ETarget) LTarget TVar CtxF OutTerm Proof :-
+  coq.say "preprocess case 10",
   ((
     (
       relation F (some ETarget) LSource R NArgs R' LTarget NDrop EquProof
@@ -338,6 +352,7 @@ preprocess (app [F|Args]) (some ETarget) LTarget TVar CtxF OutTerm Proof :-
     if (TVar = covariant) (
       RwProof = proof.of-term {{ @iffRL lp:A lp:B lp:RwLemma }}
     ) (
+      coq.say "ICI 1",
       RwProof = proof.of-term {{ @iffLR lp:A lp:B lp:RwLemma }}
     ),
     if (LTarget = {{ bool }}) (
@@ -366,6 +381,7 @@ preprocess (app [F|Args]) none LTarget TVar CtxF OutTerm Proof :-
   )),
   fill-vars R FullR UsedTypeArgs,
   when (FullR = app [F|RArgs]) (unify-args Args RArgs), !,
+  coq.say "preprocess case 11",
   when (debug) (coq.say "preprocess relation (with target)" {coq.term->string R}),
   std.take-last NArgs Args NonTypeArgs,
   std.append UsedTypeArgs NonTypeArgs ProofArgs,
@@ -380,6 +396,7 @@ preprocess (app [F|Args]) none LTarget TVar CtxF OutTerm Proof :-
     if (TVar = covariant) (
       RwProof = proof.of-term {{ @iffRL lp:A lp:B lp:RwLemma }}
     ) (
+      coq.say "ICI 2",
       RwProof = proof.of-term {{ @iffLR lp:A lp:B lp:RwLemma }}
     ),
     if (LTarget = {{ bool }}) (
@@ -398,6 +415,7 @@ preprocess (app [F|Args]) none LTarget TVar CtxF OutTerm Proof :-
 
 % embedded symbol of arity 0
 preprocess (app [cast E, X]) (some ETarget) _ TVar CtxF X' Proof :-
+  coq.say "preprocess case 12",
   embedding _ ETarget E _ _ _ _ _ _,
   ((
     symbol X (some ETarget) X' EqProof, !
@@ -412,6 +430,7 @@ preprocess (app [cast E, X]) (some ETarget) _ TVar CtxF X' Proof :-
 % embedded variable or constant
 preprocess
   (app [cast E, X]) (some ETarget) _ _ CtxF (app [cast E, X]) (proof.none (CtxF (app [E, X]))) :-
+  coq.say "preprocess case 13",
     embedding _ ETarget E _ _ _ _ _ _,
     ( ( decl X _ _, ! )
     ; ( def X _ _ _, ! )
@@ -424,6 +443,7 @@ preprocess
 % embedded function application (unknown)
 preprocess
   (app [cast E, app [F|Args]]) (some ETarget) LTarget TVar CtxF (app [cast E, Term]) Proof :-
+    coq.say "preprocess case 14",
     embedding _ ETarget E _ _ _ _ _ _, !,
     when (debug) (coq.say "preprocess embedded function application" {coq.term->string F}),
     CtxF' = (ts\ CtxF (app [E, app [F|ts]])),
@@ -435,6 +455,7 @@ preprocess
 
 % function application (unknown)
 preprocess (app [F|Args]) (some ETarget) LTarget TVar CtxF (app [F|ProcessedArgs]) Proof :- !,
+  coq.say "preprocess case 15",
   when (debug) (coq.say "preprocess function application (with target)" {coq.term->string F}),
   CtxF' = (ts\ CtxF (app [F|ts])),
   try-add-embedding-identity.list ETarget Args TVar CtxF' EmbeddedArgs ArgEmbeddingIdProofs,
@@ -443,6 +464,7 @@ preprocess (app [F|Args]) (some ETarget) LTarget TVar CtxF (app [F|ProcessedArgs
   Proof = proof.trans TVar Proofs.
 
 preprocess (app [F|Args]) none LTarget TVar CtxF (app [F|ProcessedArgs]) Proof :- !,
+  coq.say "preprocess case 16",
   when (debug) (coq.say "preprocess function application (no target)" {coq.term->string F}),
   CtxF' = (ts\ CtxF (app [F|ts])),
   preprocess.args Args none LTarget TVar CtxF' ProcessedArgs Proofs,
@@ -450,6 +472,7 @@ preprocess (app [F|Args]) none LTarget TVar CtxF (app [F|ProcessedArgs]) Proof :
 
 % other terms are left untouched
 preprocess Term _ _ _ CtxF Term (proof.none (CtxF Term)) :-
+  coq.say "preprocess case 17",
   when (debug) (coq.say "preprocess none" {coq.term->string Term}).
 
 % fold preprocess, empty context and a specific type variance for each argument
