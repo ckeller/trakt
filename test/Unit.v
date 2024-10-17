@@ -51,8 +51,7 @@ Section Issue11.
     trakt bool.
   Abort.
 
-  (* When the context around P is an equivalence, it may be provable,
-     but we do not handle it yet. *)
+  (* When the context around P is an equivalence, it is correct *)
   Goal forall f : nat -> Prop, (forall r : nat, f r <-> P r) -> True.
   Proof.
     trakt bool.

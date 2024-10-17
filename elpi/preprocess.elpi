@@ -316,7 +316,7 @@ preprocess (app [F|Args]) none LTarget TVar CtxF PreprocRel Term' Proof :-
   Proof = proof.trans TVar [EqRwProof|ArgProofs].
 
 % relation
-preprocess (app [F|Args]) (some ETarget) LTarget TVar CtxF PreprocRel OutTerm Proof :-
+preprocess (app [F|Args]) (some ETarget) LTarget TVar CtxF true OutTerm Proof :-
   ((
     (
       relation F (some ETarget) LSource R NArgs R' LTarget NDrop EquProof
@@ -362,7 +362,7 @@ preprocess (app [F|Args]) (some ETarget) LTarget TVar CtxF PreprocRel OutTerm Pr
     )
   ),
   preprocess.args
-    EmbeddedArgs (some ETarget) LTarget TVar (ts\ CtxF (LogicCast (app [R'|ts]))) PreprocRel
+    EmbeddedArgs (some ETarget) LTarget TVar (ts\ CtxF (LogicCast (app [R'|ts]))) true
     ProcessedArgs ArgProofs,
   std.drop NDrop UsedTypeArgs UsedTypeArgs',
   std.append UsedTypeArgs' ProcessedArgs OutTermArgs,
@@ -371,7 +371,7 @@ preprocess (app [F|Args]) (some ETarget) LTarget TVar CtxF PreprocRel OutTerm Pr
   Proof = proof.trans TVar [RwProof|ArgProofs].
 
 % function application (relation)
-preprocess (app [F|Args]) none LTarget TVar CtxF PreprocRel OutTerm Proof :-
+preprocess (app [F|Args]) none LTarget TVar CtxF true OutTerm Proof :-
   (
     relation F none LSource R NArgs R' LTarget NDrop EquProof
   ; (
@@ -406,7 +406,7 @@ preprocess (app [F|Args]) none LTarget TVar CtxF PreprocRel OutTerm Proof :-
     )
   ),
   preprocess.args
-    NonTypeArgs none LTarget TVar (ts\ CtxF (LogicCast (app [R'|ts]))) PreprocRel ProcessedArgs ArgProofs,
+    NonTypeArgs none LTarget TVar (ts\ CtxF (LogicCast (app [R'|ts]))) true ProcessedArgs ArgProofs,
   std.drop NDrop UsedTypeArgs UsedTypeArgs',
   std.append UsedTypeArgs' ProcessedArgs OutTermArgs,
   coq.mk-app R' OutTermArgs TermNotCast,
@@ -459,7 +459,7 @@ preprocess (app [F|Args]) (some ETarget) LTarget TVar CtxF PreprocRel (app [F|Pr
   when (debug) (coq.say "preprocess function application (with target)" {coq.term->string F}),
   CtxF' = (ts\ CtxF (app [F|ts])),
   try-add-embedding-identity.list ETarget Args TVar CtxF' EmbeddedArgs ArgEmbeddingIdProofs,
-  preprocess.args EmbeddedArgs (some ETarget) LTarget TVar CtxF' PreprocRel ProcessedArgs ArgProofs,
+  preprocess.args EmbeddedArgs (some ETarget) LTarget TVar CtxF' false ProcessedArgs ArgProofs,
   std.append ArgEmbeddingIdProofs ArgProofs Proofs,
   Proof = proof.trans TVar Proofs.
 
@@ -467,7 +467,7 @@ preprocess (app [F|Args]) none LTarget TVar CtxF PreprocRel (app [F|ProcessedArg
   coq.say "preprocess case 16",
   when (debug) (coq.say "preprocess function application (no target)" {coq.term->string F}),
   CtxF' = (ts\ CtxF (app [F|ts])),
-  preprocess.args Args none LTarget TVar CtxF' PreprocRel ProcessedArgs Proofs,
+  preprocess.args Args none LTarget TVar CtxF' false ProcessedArgs Proofs,
   Proof = proof.trans TVar Proofs.
 
 % other terms are left untouched
