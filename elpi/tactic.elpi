@@ -50,7 +50,7 @@ preprocess-extra
 
     % 4. launch preprocessing
     coq.say "preprocess-extra 04",
-    preprocess Term3 ETargetOpt LTarget TVar (t\ t) Term4 Proof,
+    preprocess Term3 ETargetOpt LTarget TVar (t\ t) true Term4 Proof,
 
     when (debug)
       (coq.say "after preprocess (raw):" Term4),
@@ -83,8 +83,8 @@ preprocess-extra
         coq.say "preprocess-extra branch 02",
         coq.term->string CleanCoqProof CleanCoqProofS,
         coq.say "CleanCoqProof = " CleanCoqProofS,
-      coq.elaborate-skeleton CleanCoqProof _ _ (error Err),
-      coq.say "Error: " Err,
+      %% coq.elaborate-skeleton CleanCoqProof _ _ (error Err),
+      %% coq.say "Error: " Err,
       coq.elaborate-skeleton CleanCoqProof _ CleanTypedCoqProof ok,
       if (TVar = covariant) (
         coq.say "preprocess-extra branch 03a",
