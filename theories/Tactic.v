@@ -192,11 +192,15 @@ Elpi Accumulate File common.
 Elpi Accumulate File proof.
 Elpi Accumulate File boolify_arrows.
 Elpi Accumulate lp:{{
-    coq.say "Cas 11",
+
   solve ((goal _ _ GoalTy _ []) as InitialGoal) NewGoals :- !, std.do! [
+    coq.say "Cas 11a",
     coq.elaborate-skeleton GoalTy _ EGoalTy ok,
+    coq.say "Cas 11b",
     boolify-arrows EGoalTy covariant true GoalTy' Proof,
+    coq.say "Cas 11c",
     build Proof CoqProof,
+    coq.say "Cas 11d",
     refine {{ lp:CoqProof (_ : lp:GoalTy') }} InitialGoal NewGoals
   ].
 
