@@ -42,7 +42,7 @@ Elpi Accumulate File bool_to_prop.
 Elpi Accumulate File tactic.
 Elpi Accumulate lp:{{
   solve InitialGoal NewGoals :-
-    coq.say "Cas 01",
+    %coq.say "Cas 01",
     InitialGoal = goal Context _ InitialGoalTy _ [trm ETarget, trm LTarget, trm RuntimeRelData],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}), !,
     std.assert! (format-runtime-relation-data RuntimeRelData RuntimeRelCtx)
@@ -52,7 +52,7 @@ Elpi Accumulate lp:{{
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals.
 
   solve InitialGoal NewGoals :-
-    coq.say "Cas 02",
+    %coq.say "Cas 02",
     InitialGoal = goal Context _ InitialGoalTy _ [trm ETarget, trm LTarget],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}), !,
     [] =>
@@ -60,7 +60,7 @@ Elpi Accumulate lp:{{
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals.
 
   solve InitialGoal NewGoals :-
-    coq.say "Cas 03",
+    %coq.say "Cas 03",
     InitialGoal = goal Context _ InitialGoalTy _ [trm LTarget, trm RuntimeRelData],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}), !,
     std.assert! (format-runtime-relation-data RuntimeRelData RuntimeRelCtx)
@@ -70,7 +70,7 @@ Elpi Accumulate lp:{{
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals.
 
   solve InitialGoal NewGoals :-
-    coq.say "Cas 04",
+    %coq.say "Cas 04",
     InitialGoal = goal Context _ InitialGoalTy _ [trm LTarget],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}), !,
     [] =>
@@ -78,7 +78,7 @@ Elpi Accumulate lp:{{
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals.
 
   solve _ _ :-
-    coq.say "Cas 05",
+    %coq.say "Cas 05",
     coq.error "usage: trakt [target embedding type] <bool|Prop> [with rel <relations>]".
 }}.
 Elpi Typecheck.
