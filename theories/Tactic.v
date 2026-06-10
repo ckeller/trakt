@@ -47,14 +47,14 @@ Elpi Accumulate lp:{{
       "wrong runtime relations format",
     ((id-list-prop RuntimeRelCtx => preprocess-extra InitialGoalTy Context (some ETarget) LTarget covariant true EndGoalTy Proof),
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals ;
-      coq.ltac.fail 0 "trakt: something went wrong. You can open an issue in rocq-trakt/trakt, smtcoq/smtcoq or smtcoq/sniper.").
+      coq.ltac.fail 0 "trakt: something went wrong. Please open an issue at https://github.com/rocq-trakt/trakt/issues").
 
   solve InitialGoal NewGoals :-
     InitialGoal = goal Context _ InitialGoalTy _ [trm ETarget, trm LTarget],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}), !,
     (preprocess-extra InitialGoalTy Context (some ETarget) LTarget covariant true EndGoalTy Proof,
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals ;
-      coq.ltac.fail 0 "trakt: something went wrong. You can open an issue in rocq-trakt/trakt, smtcoq/smtcoq or smtcoq/sniper.").
+      coq.ltac.fail 0 "trakt: something went wrong. Please open an issue at https://github.com/rocq-trakt/trakt/issues").
 
   solve InitialGoal NewGoals :-
     InitialGoal = goal Context _ InitialGoalTy _ [trm LTarget, trm RuntimeRelData],
@@ -63,14 +63,14 @@ Elpi Accumulate lp:{{
       "wrong runtime relations format",
     ((id-list-prop RuntimeRelCtx => preprocess-extra InitialGoalTy Context none LTarget covariant true EndGoalTy Proof),
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals ;
-      coq.ltac.fail 0 "trakt: something went wrong. You can open an issue in rocq-trakt/trakt, smtcoq/smtcoq or smtcoq/sniper.").
+      coq.ltac.fail 0 "trakt: something went wrong. Please open an issue at https://github.com/rocq-trakt/trakt/issues").
 
   solve InitialGoal NewGoals :-
     InitialGoal = goal Context _ InitialGoalTy _ [trm LTarget],
     (LTarget = {{ Prop }} ; LTarget = {{ bool }}), !,
     (preprocess-extra InitialGoalTy Context none LTarget covariant true EndGoalTy Proof,
       refine {{ lp:Proof (_ : lp:EndGoalTy) }} InitialGoal NewGoals ;
-      coq.ltac.fail 0 "trakt: something went wrong. You can open an issue in rocq-trakt/trakt, smtcoq/smtcoq or smtcoq/sniper.").
+      coq.ltac.fail 0 "trakt: something went wrong. Please open an issue at https://github.com/rocq-trakt/trakt/issues").
 
   solve _ _ :-
     coq.error "usage: trakt [target embedding type] <bool|Prop> [with rel <relations>]".
