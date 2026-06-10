@@ -28,10 +28,13 @@
    "category:Miscellaneous/Coq Extensions"
    "keyword:automation"
    "keyword:elpi"
-   "date:2022-05-16"
    "logpath:Trakt"))
  (depends
+  (rocq-core
+   (>= 9.0.0))
+  (rocq-stdlib
+   (>= 9.0.0))
   (rocq-elpi
    (>= 3.2.0))
-  (rocq-core
-   (>= 9.0.0))))
+ )
+)
